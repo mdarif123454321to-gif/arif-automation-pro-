@@ -1,0 +1,5 @@
+dependencies:
+  flutter:
+    sdk: flutter
+  socket_io_client: ^2.0.3
+  flutter_phone_direct_caller: ^2.1.1 # সরাসরি কল দেওয়ার জন্য

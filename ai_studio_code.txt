@@ -1,0 +1,47 @@
+import 'package:flutter/material.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+
+void main() => runApp(MaterialApp(home: GatewayScreen()));
+
+class GatewayScreen extends StatefulWidget {
+  @override
+  _GatewayScreenState createState() => _GatewayScreenState();
+}
+
+class _GatewayScreenState extends State<GatewayScreen> {
+  late IO.Socket socket;
+  String status = "ডিসকানেক্টেড";
+
+  @override
+  void initState() {
+    super.initState();
+    initSocket();
+  }
+
+  void initSocket() {
+    // আপনার সার্ভার URL দিন
+    socket = IO.io('https://your-node-server.onrender.com', 
+      IO.OptionBuilder().setTransports(['websocket']).build());
+
+    socket.onConnect((_) {
+      setState(() => status = "সার্ভারের সাথে কানেক্টেড (গেটওয়ে রেডি)");
+    });
+
+    // সার্ভার থেকে কল করার কমান্ড আসলে:
+    socket.on("trigger-call", (data) async {
+      String number = data['phoneNumber'];
+      print("Calling: $number");
+      // সরাসরি সিম দিয়ে কল দিবে
+      await FlutterPhoneDirectCaller.callNumber(number);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("SIM Gateway")),
+      body: Center(child: Text("স্ট্যাটাস: $status")),
+    );
+  }
+}
